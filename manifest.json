@@ -1,0 +1,9 @@
+{
+  "name": "EDITH",
+  "short_name": "EDITH",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#121214",
+  "theme_color": "#121214",
+  "icons": []
+}
