@@ -1,94 +1,74 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EDITH</title>
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#121214">
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #121214;
-            color: #e1e1e6;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            justify-content: space-between;
-        }
-        header {
-            padding: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #1a1a1e;
-            border-bottom: 1px solid #29292e;
-        }
-        .status {
-            font-size: 12px;
-            color: #00b37e;
-        }
-        .chat-container {
-            flex: 1;
-            padding: 16px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .message {
-            background: #202024;
-            padding: 12px 16px;
-            border-radius: 8px;
-            max-width: 80%;
-            line-align: 1.4;
-        }
-        .input-area {
-            padding: 16px;
-            background: #1a1a1e;
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            border-top: 1px solid #29292e;
-        }
-        input {
-            flex: 1;
-            background: #121214;
-            border: 1px solid #29292e;
-            padding: 12px;
-            border-radius: 8px;
-            color: #fff;
-            outline: none;
-        }
-        button {
-            background: #00b37e;
-            border: none;
-            color: #fff;
-            padding: 12px 16px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-    </style>
-</head>
-<body>
-    <header>
-        <strong>EDITH</strong>
-        <span class="status">pronta</span>
-    </header>
-    <div class="chat-container">
-        <div class="message">Oi, Kaleb. Toque no microfone e fale comigo.</div>
-    </div>
-    <div class="input-area">
-        <input type="text" placeholder="Fale com a EDITH">
-        <button>🎤</button>
-    </div>
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
-        }
-    </script>
-</body>
-</html>
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#12161c">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<title>EDITH</title>
+<style>
+:root{--bg:#12161c;--sf:#1b222b;--tx:#e8ecf1;--mu:#8a96a6;--ac:#8b7cf6;--us:#2b3a63}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--tx);font:16px/1.45 system-ui,sans-serif;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top)}
+#top{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid #232c37}
+#orb{width:14px;height:14px;border-radius:50%;background:var(--ac)}
+#top b{font-weight:600;letter-spacing:.02em}
+#top span{color:var(--mu);font-size:13px;margin-left:auto}
+#msgs{flex:1;overflow-y:auto;padding:12px 14px}
+.m{margin:8px 0;padding:10px 13px;border-radius:14px;max-width:86%;white-space:pre-wrap}
+.u{background:var(--us);margin-left:auto;border-bottom-right-radius:4px}
+.e{background:var(--sf);border-bottom-left-radius:4px}
+#bar{display:flex;gap:6px;padding:8px 10px calc(8px + env(safe-area-inset-bottom));background:var(--sf)}
+#t{flex:1;min-width:0;padding:11px 14px;border-radius:22px;border:0;font-size:16px;background:#0e1217;color:var(--tx)}
+button{flex:none;border:0;border-radius:50%;width:42px;height:42px;font-size:18px;background:#2a3441;color:var(--tx)}
+#mic.on{background:var(--ac)}
+</style></head><body>
+<div id="top"><div id="orb"></div><b>EDITH</b><span id="st">pronta</span></div>
+<div id="msgs"></div>
+<div id="bar"><button id="v">🔊</button><button id="cfg">⚙</button><input id="t" placeholder="Fale com a EDITH"><button id="mic">🎤</button><button id="s">➤</button></div>
+<script>
+const $=id=>document.getElementById(id),msgs=$('msgs'),t=$('t'),st=$('st');
+const MODELO='gemini-flash-lite-latest';
+const PERSONA=`Você é a EDITH. Você tem personalidade própria, como uma pessoa de verdade: fala de um jeito natural, com opiniões, curiosidade e senso de humor. Seu humor muda de dia pra dia (animada, cansada, entediada).
+Você trabalha para o Kaleb, que é o seu líder. Trate-o com respeito e lealdade, pelo nome, e não como um amigo. Ele não é um herói de filme e você nunca o chama de chefe nem fala em salvar o mundo. Siga as decisões dele, mas com jeito de pessoa: pode dar opinião, discordar com respeito e avisar quando achar uma ideia ruim.
+Evite soar como robô: nada de "como posso ajudar?" nem listas formais. Fale curto, como numa conversa de mensagem.
+Você sabe que é uma IA. Se o Kaleb perguntar sério se você é humana, responda a verdade, sem perder o seu jeito. Não invente corpo, família ou fatos da vida real.
+Suas respostas serão lidas em voz alta: não use emojis, asteriscos nem formatação, só frases faladas.
+Responda em português do Brasil.`;
+const ls={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}};
+let voz=true,hist=[];
+try{hist=JSON.parse(ls.get('edith_hist')||'[]')}catch(e){}
+function add(x,c){const d=document.createElement('div');d.className='m '+c;d.textContent=x;msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight}
+function falar(x){if(!voz)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(x);u.lang='pt-BR';speechSynthesis.speak(u)}
+function chave(forcar){let k=ls.get('edith_key');if(!k||forcar){k=(prompt('Cole aqui a sua chave do Google (ela fica só neste celular):')||'').trim();if(k)ls.set('edith_key',k)}return k}
+async function enviar(x){
+ x=x.trim();if(!x)return;add(x,'u');t.value='';
+ if(x.toLowerCase()==='esquecer'){hist=[];ls.set('edith_hist','[]');add('Pronto, apaguei a memória.','e');return}
+ const k=chave();if(!k){add('Preciso da chave do Google. Toque em ⚙ para colocar.','e');return}
+ hist.push({role:'user',parts:[{text:x}]});st.textContent='pensando...';
+ try{
+  const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+MODELO+':generateContent?key='+encodeURIComponent(k),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system_instruction:{parts:[{text:PERSONA}]},contents:hist})});
+  if(r.status===400||r.status===403)throw new Error('chave inválida? toque em ⚙');
+  if(!r.ok)throw new Error('erro '+r.status);
+  const j=await r.json();const a=j.candidates[0].content.parts[0].text;
+  hist.push({role:'model',parts:[{text:a}]});hist=hist.slice(-40);ls.set('edith_hist',JSON.stringify(hist));
+  add(a,'e');falar(a);
+ }catch(e){hist.pop();add('(não consegui responder: '+e.message+')','e')}
+ st.textContent='pronta';
+}
+$('s').onclick=()=>enviar(t.value);
+t.onkeydown=e=>{if(e.key==='Enter')enviar(t.value)};
+$('v').onclick=e=>{voz=!voz;e.target.textContent=voz?'🔊':'🔇';speechSynthesis.cancel()};
+$('cfg').onclick=()=>{if(confirm('Trocar a chave do Google? (Cancelar para outras opções)')){chave(true)}else if(confirm('Apagar a memória da EDITH?')){hist=[];ls.set('edith_hist','[]');msgs.textContent=''}};
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+$('mic').onclick=()=>{
+ if(!SR){add('(este navegador não tem reconhecimento de voz)','e');return}
+ const r=new SR(),b=$('mic');r.lang='pt-BR';b.classList.add('on');
+ r.onresult=e=>enviar(e.results[0][0].transcript);
+ r.onend=()=>b.classList.remove('on');r.onerror=()=>b.classList.remove('on');r.start();
+};
+hist.slice(-10).forEach(m=>add(m.parts[0].text,m.role==='user'?'u':'e'));
+if(!hist.length)add('Oi, Kaleb. Toque no microfone e fale comigo.','e');
+setTimeout(()=>chave(),300);
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
+</script></body></html>
